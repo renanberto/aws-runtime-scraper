@@ -1,0 +1,13 @@
+version: 0.0.0
+general:
+  scraper:
+      tableSelector: "table#w1000aac19c39c23b5" # NEED BE CHECKED ALWAYS BEFORE BUILD
+      url: "https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html"
+      filePath: "runtime_eol.csv"
+  aws:
+    accounts:
+      - id: "ACCOUNT_ID"
+        token: "ACCOUNT_TOKEN"
+        key: "ACCOUNT_KEY"
+        arn: "ACCOUNT_MFA_ARN"
+        session: ""
