@@ -42,6 +42,8 @@ jobs:
           echo "GOARCH=$GOARCH" >> $GITHUB_ENV
 
       - name: Build
+        env:
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
         run: |
           go build -o "$BINARY_NAME" -v
           zip --junk-paths "$BINARY_NAME" "$BINARY_NAME"
