@@ -11,6 +11,7 @@ Firstly should clone the repo local or fork and ajust your properties.
 * `download released binary`
 * `chmod +x automatic-runtime-validate && mv automatic-runtime-validate /usr/local/bin/`
 * `automatic-runtime-validate --help`
+* `automatic-runtime-validate search-by-region --config-file config/general.yml --region eu-west-1`
 
 Global
 ```
