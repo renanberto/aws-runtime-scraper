@@ -31,19 +31,31 @@ func (s SScraper) Run() SScraper {
 
 	// Search for tableSelector and get all rows
 	s.collector.OnHTML(s.config.TableSelector, func(e *colly.HTMLElement) {
-		e.ForEach("tr", func(_ int, tr *colly.HTMLElement) {
-			row := []string{}
-			tr.ForEach("td", func(_ int, td *colly.HTMLElement) {
-				row = append(row, strings.TrimSpace(td.Text))
-			})
-			for i := 0; i < schema.NumField(); i++ {
-				if len(row) > i {
-					if schema.Field(i).Kind() == reflect.String {
-						schema.Field(i).SetString(row[i])
+		e.ForEach("table", func(_ int, tr *colly.HTMLElement) {
+			if tr.ChildText("div.title") == s.config.TableTitle {
+				e.ForEach("tr", func(_ int, tr *colly.HTMLElement) {
+					row := []string{}
+					tr.ForEach("td", func(_ int, td *colly.HTMLElement) {
+						row = append(row, strings.TrimSpace(td.Text))
+					})
+					for i := 0; i < schema.NumField(); i++ {
+						if len(row) > i {
+							if len(row[i]) == 0 {
+								schema.Field(i).SetString("N/D")
+								continue
+							}
+							if schema.Field(i).Kind() == reflect.String {
+								schema.Field(i).SetString(row[i])
+							}
+						}
 					}
-				}
+					if val, ok := schema.Interface().(TableEOL); ok {
+						if len(val.Name) > 0 {
+							s.table = append(s.table, schema.Interface().(TableEOL))
+						}
+					}
+				})
 			}
-			s.table = append(s.table, schema.Interface().(TableEOL))
 		})
 	})
 

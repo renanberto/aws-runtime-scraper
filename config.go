@@ -1,8 +1,8 @@
 package main
 
 import (
-	"io/ioutil"
 	"log"
+	"os"
 
 	"gopkg.in/yaml.v2"
 )
@@ -10,7 +10,7 @@ import (
 var config Configuration
 
 func init() {
-	file, err := ioutil.ReadFile("config/general.yml")
+	file, err := os.ReadFile("config/general.yml")
 	if err != nil {
 		log.Fatal(err)
 	}

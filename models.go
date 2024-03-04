@@ -10,6 +10,7 @@ type Configuration struct {
 type ScraperConfig struct {
 	TableSelector string `yaml:"tableSelector"`
 	URL           string `yaml:"url"`
+	TableTitle    string `yaml:"tableTitle"`
 	FilePath      string `yaml:"filePath"`
 }
 

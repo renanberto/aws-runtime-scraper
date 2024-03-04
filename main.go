@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 
@@ -10,9 +9,7 @@ import (
 
 func main() {
 	scrapper := NewScraper(config).Run()
-	table := scrapper.table
-
-	// awss := NewAWS(config)
+	awss := NewAWS(config, scrapper)
 
 	app := &cli.App{
 		EnableBashCompletion: true,
@@ -33,13 +30,18 @@ func main() {
 					},
 				},
 				Action: func(cCtx *cli.Context) error {
-					for _, v := range table {
-						fmt.Println(v.Identifier)
+					awss.SearchRuntimeByRegion(cCtx.String("region"))
+					if cCtx.Bool("export") {
+						scrapper.toCSV()
 					}
-					// awss.SearchRuntimeByRegion(cCtx.String("region"))
-					// if cCtx.Bool("export") {
-					// 	scrapper.toCSV()
-					// }
+					return nil
+				},
+			},
+			{
+				Name:  "search-all",
+				Usage: "search all lambdas EOL at all regions (low performance)",
+				Action: func(ctx *cli.Context) error {
+					awss.SearchRuntimeAllRegions()
 					return nil
 				},
 			},
