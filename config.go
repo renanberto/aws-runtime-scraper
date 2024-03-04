@@ -9,12 +9,12 @@ import (
 
 var config Configuration
 
-func init() {
-	file, err := os.ReadFile("config/general.yml")
+func configure(file string) {
+	f, err := os.ReadFile(file)
 	if err != nil {
 		log.Fatal(err)
 	}
-	if err := yaml.Unmarshal(file, &config); err != nil {
+	if err := yaml.Unmarshal(f, &config); err != nil {
 		log.Fatal(err)
 	}
 }

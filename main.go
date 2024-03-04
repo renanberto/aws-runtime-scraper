@@ -8,9 +8,6 @@ import (
 )
 
 func main() {
-	scrapper := NewScraper(config).Run()
-	awss := NewAWS(config, scrapper)
-
 	app := &cli.App{
 		EnableBashCompletion: true,
 		Name:                 "AWS Lambda runtime EOL",
@@ -24,12 +21,22 @@ func main() {
 						Usage:    "Region to search",
 						Required: true,
 					},
+					&cli.StringFlag{
+						Name:     "config-file",
+						Usage:    "Load configurion file",
+						Required: true,
+					},
 					&cli.BoolFlag{
 						Name:  "export",
 						Usage: "Export result to CSV file",
 					},
 				},
 				Action: func(cCtx *cli.Context) error {
+					configure(cCtx.String("config-file"))
+
+					scrapper := NewScraper(config).Run()
+					awss := NewAWS(config, scrapper)
+
 					awss.SearchRuntimeByRegion(cCtx.String("region"))
 					if cCtx.Bool("export") {
 						scrapper.toCSV()
@@ -40,7 +47,19 @@ func main() {
 			{
 				Name:  "search-all",
 				Usage: "search all lambdas EOL at all regions (low performance)",
-				Action: func(ctx *cli.Context) error {
+				Flags: []cli.Flag{
+					&cli.StringFlag{
+						Name:     "config-file",
+						Usage:    "Load configurion file",
+						Required: true,
+					},
+				},
+				Action: func(cCtx *cli.Context) error {
+					configure(cCtx.String("config-file"))
+
+					scrapper := NewScraper(config).Run()
+					awss := NewAWS(config, scrapper)
+
 					awss.SearchRuntimeAllRegions()
 					return nil
 				},
