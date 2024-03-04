@@ -43,3 +43,11 @@ type LambdaProperties struct {
 	Version      string
 	LastModified string
 }
+
+func convertRuntimeToArray(tableEOL []TableEOL) []string {
+	runtime := []string{}
+	for _, v := range tableEOL {
+		runtime = append(runtime, v.Identifier)
+	}
+	return runtime
+}

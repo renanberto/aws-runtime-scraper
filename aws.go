@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"slices"
 	"strings"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -34,12 +35,7 @@ func (a awss) SearchRuntimeAllRegions() {
 		sess := a.generateAuth(account)
 		regions := a.listAllRegions(sess)
 		for _, region := range regions {
-			for _, table := range a.scrapper.table {
-				lambdas := a.runtimeSearchByIdentifier(sess, *region.RegionName, table.Identifier)
-				for _, v := range lambdas {
-					fmt.Println(v.FunctionName)
-				}
-			}
+			a.searchRuntime(sess, *region.RegionName, convertRuntimeToArray(a.scrapper.table))
 		}
 	}
 }
@@ -47,16 +43,12 @@ func (a awss) SearchRuntimeAllRegions() {
 func (a awss) SearchRuntimeByRegion(regionName string) {
 	for _, account := range a.config.Accounts {
 		sess := a.generateAuth(account)
-		for _, table := range a.scrapper.table {
-			lambdas := a.runtimeSearchByIdentifier(sess, regionName, table.Identifier)
-			for _, v := range lambdas {
-				fmt.Println(v.FunctionName)
-			}
-		}
+		lambdas := a.searchRuntime(sess, regionName, convertRuntimeToArray(a.scrapper.table))
+		LambdaPrinter(lambdas, regionName)
 	}
 }
 
-func (a awss) runtimeSearchByIdentifier(sess *session.Session, regionName string, identifier string) []LambdaProperties {
+func (a awss) searchRuntime(sess *session.Session, regionName string, runtime []string) []LambdaProperties {
 	lambdas := a.lambdaProperties
 	sess.Config.Region = aws.String(regionName)
 	service := lambda.New(sess)
@@ -66,15 +58,14 @@ func (a awss) runtimeSearchByIdentifier(sess *session.Session, regionName string
 		log.Fatal(err)
 	}
 	for _, f := range list.Functions {
-		if *f.Runtime == identifier {
-			lambda := LambdaProperties{
+		if slices.Contains(runtime, *f.Runtime) {
+			lambdas = append(lambdas, LambdaProperties{
 				FunctionName: *f.FunctionName,
 				FunctionARN:  *f.FunctionArn,
 				Runtime:      *f.Runtime,
 				Version:      *f.Version,
 				LastModified: *f.LastModified,
-			}
-			lambdas = append(lambdas, lambda)
+			})
 		}
 	}
 	return lambdas
