@@ -19,7 +19,7 @@ jobs:
       matrix:
         # List of GOOS and GOARCH pairs from `go tool dist list`
         goosarch:
-          - 'aix/ppc64'
+          - 'linux/amd64'
           # etc
     steps:
       - name: Checkout code
@@ -36,7 +36,8 @@ jobs:
           GOOSARCH=${{matrix.goosarch}}
           GOOS=${GOOSARCH%/*}
           GOARCH=${GOOSARCH#*/}
-          BINARY_NAME=${{github.repository}}-$GOOS-$GOARCH
+          REPOSITORY_NAME=${{github.repository#*/}}
+          BINARY_NAME=$REPOSITORY_NAME-$GOOS-$GOARCH
           echo "BINARY_NAME=$BINARY_NAME" >> $GITHUB_ENV
           echo "GOOS=$GOOS" >> $GITHUB_ENV
           echo "GOARCH=$GOARCH" >> $GITHUB_ENV
